@@ -9,7 +9,6 @@ class Borrow(models.Model):
         BORROWED = 'BRW', 'borrowed'
         RETURNED = 'RTN', 'returned'
         OVERDUE = 'OVD', 'overdue'
-        LOST = 'LST', 'สูญหาย'
 
     created_at = models.DateTimeField(auto_now_add=True)
     expired_at = models.DateTimeField(null=True,blank=True)
@@ -25,7 +24,7 @@ class Borrow(models.Model):
         Book,
         on_delete=models.CASCADE,
         related_name='borrowing_history',
-        verbose_name='สิ่งของที่ยืม'
+        verbose_name='หนังสือที่ยืม'
     )
 
     status = models.CharField(
