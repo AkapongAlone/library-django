@@ -1,0 +1,22 @@
+[project]
+name = "library-app"
+version = "0.1.0"
+description = "practies django"
+authors = [
+    {name = "AkapongAlone",email = "“petinw@gmail.com”"}
+]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "asgiref (==3.8.1)",
+    "django (==4.2.20)",
+    "django-filter (==25.1)",
+    "djangorestframework (==3.16.0)",
+    "sqlparse (==0.5.3)",
+    "typing-extensions (==4.13.2)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
