@@ -1,4 +1,5 @@
 from datetime import timedelta
+from telnetlib import STATUS
 
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
@@ -45,6 +46,13 @@ class BorrowViewSet(viewsets.ModelViewSet):
     def return_book(self, request, pk=None):
         try:
             borrow = self.get_object()
+
+            if borrow.status == Borrow.Status.RETURNED:
+                return Response(
+                    {"error": "This book has already been returned"},
+                    status=400
+                )
+
             borrow.status = Borrow.Status.RETURNED
             borrow.returned_at = timezone.now()
             borrow.save()
