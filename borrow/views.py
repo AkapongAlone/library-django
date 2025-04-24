@@ -1,9 +1,9 @@
 from datetime import timedelta
 
-from django.contrib.admin import action
+from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
-from rest_framework import viewsets
+from rest_framework import viewsets, serializers
 from rest_framework.response import Response
 
 from .models import Borrow
@@ -29,6 +29,9 @@ class BorrowViewSet(viewsets.ModelViewSet):
         return super().list(request,*args,**kwargs)
     def perform_create(self, serializer):
         book = serializer.validated_data['book']
+
+        if not book.is_active:
+            raise serializers.ValidationError({"book": "This book is not available for borrowing."})
 
         serializer.save(
             user=self.request.user,
