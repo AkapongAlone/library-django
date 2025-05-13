@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 
 from catalog.models import Book
 
@@ -44,3 +45,11 @@ class Borrow(models.Model):
         verbose_name = 'รายการยืม'
         verbose_name_plural = 'รายการยืม'
         ordering = ['-created_at']
+
+    @property
+    def property_status(self):
+        print(timezone.localtime(timezone.now()))
+        if self.status == Borrow.Status.BORROWED and self.expired_at < timezone.now():
+            self.status = Borrow.Status.OVERDUE
+            self.save()
+        return self.status

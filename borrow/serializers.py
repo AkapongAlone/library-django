@@ -7,6 +7,7 @@ class BorrowWriteSerializer(serializers.ModelSerializer):
         exclude = ['expired_at','returned_at']
 
 class BorrowReadSerializer(serializers.ModelSerializer):
+    property_status = serializers.CharField()
     class Meta :
         model = Borrow
         fields = '__all__'

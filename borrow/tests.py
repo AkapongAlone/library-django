@@ -1,11 +1,10 @@
 from datetime import timedelta
 
-from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
 
 
 from borrow.models import Borrow

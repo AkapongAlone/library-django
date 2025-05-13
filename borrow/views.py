@@ -22,20 +22,21 @@ class BorrowViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['status', 'book','user']
 
-    def list(self, request, *args, **kwargs):
-        now = timezone.now()
-
-        Borrow.objects.filter(status= Borrow.Status.BORROWED,expired_at__lt = now).update(status = Borrow.Status.OVERDUE)
-
-        return super().list(request,*args,**kwargs)
+    # def list(self, request, *args, **kwargs):
+    #     now = timezone.now()
+    #
+    #     # Borrow.objects.filter(status= Borrow.Status.BORROWED,expired_at__lt = now).update(status = Borrow.Status.OVERDUE)
+    #
+    #     return super().list(request,*args,**kwargs)
     def perform_create(self, serializer):
         book = serializer.validated_data['book']
-
+        user = serializer.validated_data['user']
+        print(user)
         if not book.is_active:
             raise serializers.ValidationError({"book": "This book is not available for borrowing."})
 
         serializer.save(
-            user=self.request.user,
+            user=user,
             expired_at=timezone.now() + timedelta(days=7)
         )
 
