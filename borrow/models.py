@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -15,7 +15,7 @@ class Borrow(models.Model):
     expired_at = models.DateTimeField(null=True,blank=True)
 
     user = models.ForeignKey(
-            User,
+            settings.AUTH_USER_MODEL,
             on_delete=models.CASCADE,
             related_name='borrowings',
             verbose_name='ผู้ยืม'
@@ -48,7 +48,6 @@ class Borrow(models.Model):
 
     @property
     def property_status(self):
-        print(timezone.localtime(timezone.now()))
         if self.status == Borrow.Status.BORROWED and self.expired_at < timezone.now():
             self.status = Borrow.Status.OVERDUE
             self.save()

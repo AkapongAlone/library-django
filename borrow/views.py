@@ -4,7 +4,7 @@ from telnetlib import STATUS
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets, serializers, permissions
 from rest_framework.response import Response
 
 from .models import Borrow
@@ -14,6 +14,7 @@ from .serializers import BorrowWriteSerializer,BorrowReadSerializer
 class BorrowViewSet(viewsets.ModelViewSet):
     queryset = Borrow.objects.all()
 
+    permission_classes = [permissions.IsAuthenticated]
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
             return BorrowWriteSerializer
@@ -22,24 +23,21 @@ class BorrowViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['status', 'book','user']
 
-    # def list(self, request, *args, **kwargs):
-    #     now = timezone.now()
-    #
-    #     # Borrow.objects.filter(status= Borrow.Status.BORROWED,expired_at__lt = now).update(status = Borrow.Status.OVERDUE)
-    #
-    #     return super().list(request,*args,**kwargs)
     def perform_create(self, serializer):
         book = serializer.validated_data['book']
         user = serializer.validated_data['user']
         print(user)
         if not book.is_active:
             raise serializers.ValidationError({"book": "This book is not available for borrowing."})
-
+        if user.is_borrowing:
+            raise serializers.ValidationError({"user": "This user is already borrowing."})
         serializer.save(
             user=user,
             expired_at=timezone.now() + timedelta(days=7)
         )
 
+        user.is_borrowing = True
+        user.save()
         book.is_active = False
         book.save()
 
@@ -61,6 +59,10 @@ class BorrowViewSet(viewsets.ModelViewSet):
             book = borrow.book
             book.is_active = True
             book.save()
+
+            user = borrow.user
+            user.is_borrowing = False
+            user.save()
 
             serializer = BorrowReadSerializer(borrow)
             return Response(serializer.data)
